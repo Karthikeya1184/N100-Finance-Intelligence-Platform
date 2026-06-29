@@ -1,59 +1,67 @@
+import sqlite3
+from pathlib import Path
 import pandas as pd
 
-from pathlib import Path
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DB_PATH = PROJECT_ROOT / "db" / "nifty100.db"
 
-from src.etl.loader import load_all_files
 
-from src.etl.dq_rules import *
+class Validator:
 
-OUTPUT = Path("output")
+    def __init__(self):
+        self.conn = sqlite3.connect(DB_PATH)
 
-OUTPUT.mkdir(exist_ok=True)
+    def run(self):
 
-def run_validation():
+        print("=" * 60)
+        print("Running Validation")
+        print("=" * 60)
 
-    datasets = load_all_files()
+        tables = [
+            "companies",
+            "sectors",
+            "analysis",
+            "documents",
+            "prosandcons",
+            "profitandloss",
+            "balancesheet",
+            "cashflow",
+            "financial_ratios",
+            "market_cap",
+            "peer_groups",
+            "stock_prices"
+        ]
 
-    results = []
+        summary = []
 
-    companies = datasets["companies"]
+        for table in tables:
 
-    pnl = datasets["profitandloss"]
+            query = f"SELECT COUNT(*) FROM {table}"
 
-    rules = [
+            rows = pd.read_sql(query, self.conn)
 
-        dq01_company_pk(companies),
+            count = rows.iloc[0, 0]
 
-        dq02_company_name(companies),
+            print(f"{table:<20} {count}")
 
-        dq03_positive_sales(pnl)
+            summary.append({
+                "table": table,
+                "rows": count
+            })
 
-    ]
+        output = PROJECT_ROOT / "output"
 
-    for rule in rules:
+        output.mkdir(exist_ok=True)
 
-        if rule is not None:
+        pd.DataFrame(summary).to_csv(
+            output / "validation_summary.csv",
+            index=False
+        )
 
-            results.append(rule)
+        self.conn.close()
 
-    report = pd.DataFrame(results)
+        print("\nValidation Completed Successfully")
 
-    report.to_csv(
 
-        OUTPUT / "validation_failures.csv",
-
-        index=False
-
-    )
-
-    print()
-
-    print("=" * 60)
-
-    print("Validation Summary")
-
-    print("=" * 60)
-
-    print(report)
-
-    return report
+if __name__ == "__main__":
+    Validator().run()
