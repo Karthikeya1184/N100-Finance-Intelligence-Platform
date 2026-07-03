@@ -57,7 +57,7 @@ class RatioEngine:
         if roce is None:
             return "Unavailable"
 
-        if sector == "Financials":
+        if sector is not None and str(sector).strip().lower() == "financials":
             return "Sector Benchmark"
 
         if roce >= 15:
@@ -94,11 +94,22 @@ class RatioEngine:
 
     @staticmethod
     def high_leverage_flag(de_ratio, sector):
+        """
+        Returns True if a company has unusually high leverage.
+
+        Financial companies (banks, NBFCs, insurance) naturally operate
+        with higher leverage, so the warning is suppressed for them.
+        """
 
         if de_ratio is None:
             return False
 
-        if sector == "Financials":
+        if sector is None:
+            return de_ratio > 5
+
+        sector = str(sector).strip().lower()
+
+        if sector == "financials":
             return False
 
         return de_ratio > 5
