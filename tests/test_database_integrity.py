@@ -19,16 +19,17 @@ def test_total_tables():
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT COUNT(*)
-    FROM sqlite_master
-    WHERE type='table'
-    """)
+   SELECT COUNT(*)
+   FROM sqlite_master
+   WHERE type='table'
+   AND name NOT LIKE 'sqlite_%'
+   """)
 
     total = cur.fetchone()[0]
 
     conn.close()
 
-    assert total == 12
+    assert total == 13
 
 
 def test_companies_primary_key():
