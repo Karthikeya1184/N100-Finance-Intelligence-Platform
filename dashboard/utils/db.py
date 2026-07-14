@@ -120,3 +120,51 @@ def get_valuation(ticker):
         WHERE company_id='{ticker}'
         """
     )
+
+
+@st.cache_data(ttl=600)
+def get_latest_ratios(year=None):
+
+    if year:
+
+        return run_query(f"""
+        SELECT *
+        FROM financial_ratios
+        WHERE year='{year}'
+        """)
+
+    return run_query("""
+    SELECT *
+    FROM financial_ratios
+    """)
+
+
+@st.cache_data(ttl=600)
+def get_company_profile(ticker):
+
+    query = f"""
+    SELECT
+        c.company_name,
+        c.id,
+        c.about_company,
+        s.broad_sector,
+        s.sub_sector
+    FROM companies c
+    LEFT JOIN sectors s
+    ON c.id = s.company_id
+    WHERE c.id = '{ticker}'
+    """
+
+    return run_query(query)
+
+
+@st.cache_data(ttl=600)
+def get_pros_cons(ticker):
+
+    query = f"""
+    SELECT *
+    FROM prosandcons
+    WHERE company_id='{ticker}'
+    """
+
+    return run_query(query)

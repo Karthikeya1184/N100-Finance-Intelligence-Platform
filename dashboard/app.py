@@ -6,7 +6,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.title("📊 Nifty 100 Analytics")
+st.title("📊 Nifty 100 Finance Intelligence Platform")
+
+st.caption(
+    "Business Intelligence Dashboard"
+)
 
 st.sidebar.success("Select a page from the sidebar.")
 
