@@ -168,3 +168,46 @@ def get_pros_cons(ticker):
     """
 
     return run_query(query)
+
+
+@st.cache_data(ttl=600)
+def get_peer_groups():
+
+    return run_query("""
+        SELECT DISTINCT peer_group_name
+        FROM peer_groups
+        ORDER BY peer_group_name
+    """)
+
+
+@st.cache_data(ttl=600)
+def get_peer_companies(group):
+
+    return run_query(f"""
+        SELECT
+            p.company_id,
+            c.company_name,
+            p.is_benchmark
+        FROM peer_groups p
+        LEFT JOIN companies c
+        ON p.company_id=c.id
+        WHERE p.peer_group_name='{group}'
+        ORDER BY company_name
+    """)
+
+
+@st.cache_data(ttl=600)
+def get_peer_ratios(group):
+
+    return run_query(f"""
+        SELECT
+            fr.*,
+            c.company_name,
+            pg.is_benchmark
+        FROM financial_ratios fr
+        LEFT JOIN companies c
+            ON fr.company_id=c.id
+        LEFT JOIN peer_groups pg
+            ON fr.company_id=pg.company_id
+        WHERE pg.peer_group_name='{group}'
+    """)

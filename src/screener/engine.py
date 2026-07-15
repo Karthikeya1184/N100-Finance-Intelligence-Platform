@@ -19,22 +19,55 @@ class ScreenerEngine:
     def load_data(self):
 
         ratios = pd.read_sql(
-            "SELECT * FROM financial_ratios",
+            """
+            SELECT *
+            FROM financial_ratios
+            """,
             self.conn
         )
 
         sectors = pd.read_sql(
-            "SELECT company_id,broad_sector FROM sectors",
+            """
+            SELECT
+                company_id,
+                broad_sector
+            FROM sectors
+            """,
             self.conn
         )
 
         market = pd.read_sql(
-            "SELECT company_id,market_cap_crore,pe_ratio,pb_ratio,dividend_yield_pct FROM market_cap",
+            """
+            SELECT
+                company_id,
+                market_cap_crore,
+                pe_ratio,
+                pb_ratio,
+                dividend_yield_pct
+            FROM market_cap
+            """,
+            self.conn
+        )
+
+        companies = pd.read_sql(
+            """
+            SELECT
+                id,
+                company_name
+            FROM companies
+            """,
             self.conn
         )
 
         pnl = pd.read_sql(
-            "SELECT company_id,year,sales,net_profit FROM profitandloss",
+            """
+            SELECT
+                company_id,
+                year,
+                sales,
+                net_profit
+            FROM profitandloss
+            """,
             self.conn
         )
 
@@ -51,8 +84,30 @@ class ScreenerEngine:
         )
 
         df = df.merge(
-            pnl[["company_id","year","sales","net_profit"]],
-            on=["company_id","year"],
+            companies,
+            left_on="company_id",
+            right_on="id",
+            how="left"
+        )
+
+        df.drop(
+            columns=["id"],
+            inplace=True
+        )
+
+        df = df.merge(
+            pnl[
+                [
+                    "company_id",
+                    "year",
+                    "sales",
+                    "net_profit"
+                ]
+            ],
+            on=[
+                "company_id",
+                "year"
+            ],
             how="left"
         )
 
@@ -79,7 +134,10 @@ class ScreenerEngine:
 
         df = df[df["pat_cagr_5yr"] >= c["pat_cagr_5yr_min"]]
 
-        df = df[df["operating_profit_margin_pct"] >= c["operating_profit_margin_min"]]
+        df = df[
+            df["operating_profit_margin_pct"]
+            >= c["operating_profit_margin_min"]
+        ]
 
         df = df[df["pe_ratio"] <= c["pe_max"]]
 
