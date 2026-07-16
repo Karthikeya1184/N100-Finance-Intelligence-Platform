@@ -95,7 +95,7 @@ N100-Finance-Intelligence-Platform
 Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/N100-Finance-Intelligence-Platform.git
+https://github.com/Karthikeya1184/N100-Finance-Intelligence-Platform
 ```
 
 Move into the project folder
