@@ -29,7 +29,7 @@ class Validator:
             "financial_ratios",
             "market_cap",
             "peer_groups",
-            "stock_prices"
+            "stock_prices",
         ]
 
         summary = []
@@ -44,19 +44,13 @@ class Validator:
 
             print(f"{table:<20} {count}")
 
-            summary.append({
-                "table": table,
-                "rows": count
-            })
+            summary.append({"table": table, "rows": count})
 
         output = PROJECT_ROOT / "output"
 
         output.mkdir(exist_ok=True)
 
-        pd.DataFrame(summary).to_csv(
-            output / "validation_summary.csv",
-            index=False
-        )
+        pd.DataFrame(summary).to_csv(output / "validation_summary.csv", index=False)
 
         self.conn.close()
 

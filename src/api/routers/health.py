@@ -47,5 +47,5 @@ def health():
         "status": "ok",
         "db_row_counts": row_counts,
         "uptime_seconds": round(time.time() - START_TIME, 2),
-        "version": "1.0.0"
+        "version": "1.0.0",
     }

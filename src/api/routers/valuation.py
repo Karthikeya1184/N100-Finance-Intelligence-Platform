@@ -13,9 +13,11 @@ DB_PATH = PROJECT_ROOT / "db" / "nifty100.db"
 def get_connection():
     return sqlite3.connect(DB_PATH)
 
+
 # ============================================================
 # GET /market-cap/{ticker}
 # ============================================================
+
 
 @router.get("/{ticker}")
 def get_market_cap_history(ticker: str):
@@ -31,7 +33,7 @@ def get_market_cap_history(ticker: str):
         WHERE company_id = ?
         ORDER BY year
         """,
-        (ticker.upper(),)
+        (ticker.upper(),),
     )
 
     rows = cursor.fetchall()
@@ -39,9 +41,6 @@ def get_market_cap_history(ticker: str):
     conn.close()
 
     if not rows:
-        raise HTTPException(
-            status_code=404,
-            detail="Market cap history not found"
-        )
+        raise HTTPException(status_code=404, detail="Market cap history not found")
 
     return [dict(row) for row in rows]

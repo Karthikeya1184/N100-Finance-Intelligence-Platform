@@ -13,6 +13,7 @@ DB_PATH = PROJECT_ROOT / "db" / "nifty100.db"
 def get_connection():
     return sqlite3.connect(DB_PATH)
 
+
 @router.get("")
 def get_sectors():
 
@@ -67,6 +68,7 @@ def get_sectors():
 # GET /sectors/{sector}/companies
 # ============================================================
 
+
 @router.get("/{sector}/companies")
 def get_sector_companies(sector: str):
 
@@ -81,15 +83,12 @@ def get_sector_companies(sector: str):
         FROM sectors
         WHERE broad_sector = ?
         """,
-        (sector,)
+        (sector,),
     )
 
     if cursor.fetchone()[0] == 0:
         conn.close()
-        raise HTTPException(
-            status_code=404,
-            detail="Sector not found"
-        )
+        raise HTTPException(status_code=404, detail="Sector not found")
 
     query = """
     SELECT

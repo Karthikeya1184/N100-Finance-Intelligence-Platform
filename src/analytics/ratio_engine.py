@@ -21,35 +21,11 @@ class RatioEngineRunner:
 
     def merge_data(self):
 
-        merged = self.pnl.merge(
+        merged = self.pnl.merge(self.bs, on=["company_id", "year"], how="left")
 
-            self.bs,
+        merged = merged.merge(self.cf, on=["company_id", "year"], how="left")
 
-            on=["company_id", "year"],
-
-            how="left"
-
-        )
-
-        merged = merged.merge(
-
-            self.cf,
-
-            on=["company_id", "year"],
-
-            how="left"
-
-        )
-
-        merged = merged.rename(
-
-            columns={
-
-                "id_x": "id"
-
-            }
-
-        )
+        merged = merged.rename(columns={"id_x": "id"})
 
         return merged
 
@@ -57,10 +33,7 @@ class RatioEngineRunner:
 
         merged = self.merge_data()
 
-        merged = merged.drop_duplicates(
-    subset=["company_id", "year"],
-    keep="first"
-)
+        merged = merged.drop_duplicates(subset=["company_id", "year"], keep="first")
 
         final_rows = []
 
@@ -76,15 +49,11 @@ class RatioEngineRunner:
 
         for company in companies:
 
-            company_df = merged[
-                merged["company_id"] == company
-            ].copy()
+            company_df = merged[merged["company_id"] == company].copy()
 
             company_df = company_df.sort_values("year")
 
-            company_master = self.company[
-                self.company["id"] == company
-            ]
+            company_master = self.company[self.company["id"] == company]
 
             if len(company_master) == 0:
                 continue
@@ -93,15 +62,7 @@ class RatioEngineRunner:
 
             for _, row in company_df.iterrows():
 
-                ratios = RatioCalculator.calculate(
-
-                    row,
-
-                    company_df,
-
-                    company_master
-
-                )
+                ratios = RatioCalculator.calculate(row, company_df, company_master)
 
                 ratios["company_id"] = row["company_id"]
 
@@ -120,7 +81,6 @@ class RatioEngineRunner:
         print(f"Rows Created : {len(df)}")
 
         return df
-    
 
 
 if __name__ == "__main__":

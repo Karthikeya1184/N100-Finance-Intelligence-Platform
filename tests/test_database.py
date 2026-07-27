@@ -15,4 +15,3 @@ def test_database_exists():
     conn.close()
 
     assert count == 92
-    

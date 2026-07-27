@@ -71,9 +71,7 @@ class ValuationEngine:
 
         df = self.load_data()
 
-        latest = df[
-            df["year"] == self.latest_year(df)
-        ].copy()
+        latest = df[df["year"] == self.latest_year(df)].copy()
 
         return latest
 
@@ -82,29 +80,14 @@ class ValuationEngine:
         history = self.load_data()
 
         median = (
-
-            history
-
-            .groupby("company_id")["pe_ratio"]
-
+            history.groupby("company_id")["pe_ratio"]
             .median()
-
             .reset_index()
-
-            .rename(
-
-                columns={
-
-                    "pe_ratio":"5yr_median_PE"
-
-                }
-
-            )
-
+            .rename(columns={"pe_ratio": "5yr_median_PE"})
         )
 
         return median
-    
+
     def calculate(self):
 
         latest = self.latest_data()
@@ -112,68 +95,45 @@ class ValuationEngine:
         latest["FCF_yield_pct"] = np.where(
             latest["market_cap_crore"] > 0,
             (latest["free_cash_flow_cr"] / latest["market_cap_crore"]) * 100,
-            np.nan
+            np.nan,
         )
         sector_median = (
-            latest
-            .groupby("broad_sector")["pe_ratio"]
+            latest.groupby("broad_sector")["pe_ratio"]
             .median()
             .reset_index()
-            .rename(
-                columns={
-                    "pe_ratio": "sector_median_PE"
-                }
-            )
+            .rename(columns={"pe_ratio": "sector_median_PE"})
         )
 
-        latest = latest.merge(
-            sector_median,
-            on="broad_sector",
-            how="left"
-        )
+        latest = latest.merge(sector_median, on="broad_sector", how="left")
 
         latest["PE_vs_sector_median_pct"] = np.where(
             latest["sector_median_PE"] > 0,
-            (
-                latest["pe_ratio"]
-                /
-                latest["sector_median_PE"]
-            ) * 100,
-            np.nan
+            (latest["pe_ratio"] / latest["sector_median_PE"]) * 100,
+            np.nan,
         )
 
         latest["flag"] = "Fair"
 
-        latest.loc[
-            latest["pe_ratio"]
-            >
-            latest["sector_median_PE"] * 1.5,
-            "flag"
-        ] = "Caution"
+        latest.loc[latest["pe_ratio"] > latest["sector_median_PE"] * 1.5, "flag"] = (
+            "Caution"
+        )
 
-        latest.loc[
-            latest["pe_ratio"]
-            <
-            latest["sector_median_PE"] * 0.7,
-            "flag"
-        ] = "Discount"
+        latest.loc[latest["pe_ratio"] < latest["sector_median_PE"] * 0.7, "flag"] = (
+            "Discount"
+        )
 
         median = self.five_year_median_pe()
 
-        latest = latest.merge(
-            median,
-            on="company_id",
-            how="left"
-        )
+        latest = latest.merge(median, on="company_id", how="left")
 
         latest.rename(
             columns={
                 "broad_sector": "sector",
                 "pe_ratio": "P/E",
                 "pb_ratio": "P/B",
-                "ev_ebitda": "EV/EBITDA"
+                "ev_ebitda": "EV/EBITDA",
             },
-            inplace=True
+            inplace=True,
         )
 
         summary = latest[
@@ -187,7 +147,7 @@ class ValuationEngine:
                 "FCF_yield_pct",
                 "5yr_median_PE",
                 "PE_vs_sector_median_pct",
-                "flag"
+                "flag",
             ]
         ].copy()
 
@@ -197,21 +157,11 @@ class ValuationEngine:
 
         summary = self.calculate()
 
-        summary.to_excel(
-            self.output_path / "valuation_summary.xlsx",
-            index=False
-        )
+        summary.to_excel(self.output_path / "valuation_summary.xlsx", index=False)
 
-        flags = summary[
-            summary["flag"].isin(
-                ["Caution", "Discount"]
-            )
-        ].copy()
+        flags = summary[summary["flag"].isin(["Caution", "Discount"])].copy()
 
-        flags.to_csv(
-            self.output_path / "valuation_flags.csv",
-            index=False
-        )
+        flags.to_csv(self.output_path / "valuation_flags.csv", index=False)
 
         print("=" * 60)
         print("VALUATION MODULE COMPLETED")
@@ -232,8 +182,7 @@ class ValuationEngine:
 
         return summary
 
-       
-    
+
 if __name__ == "__main__":
 
     engine = ValuationEngine()

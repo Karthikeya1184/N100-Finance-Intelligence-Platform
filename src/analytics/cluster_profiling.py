@@ -27,8 +27,6 @@ class ClusterProfiling:
 
         print("Database Connected Successfully")
 
-
-
     # ============================================================
     # Load Data
     # ============================================================
@@ -76,17 +74,11 @@ class ClusterProfiling:
 
         cluster_df = pd.read_csv(cluster_path)
 
-        df = financial_df.merge(
-            cluster_df,
-            on="company_id",
-            how="left"
-        )
+        df = financial_df.merge(cluster_df, on="company_id", how="left")
 
         print(f"Loaded {len(df)} companies")
 
         return df
-
-
 
     # ============================================================
     # Cluster Profiling
@@ -102,11 +94,7 @@ class ClusterProfiling:
             "operating_profit_margin_pct",
         ]
 
-        profile = (
-            df.groupby("cluster_id")[features]
-            .agg(["mean", "median"])
-            .round(2)
-        )
+        profile = df.groupby("cluster_id")[features].agg(["mean", "median"]).round(2)
 
         output_path = self.output_dir / "cluster_profile.csv"
 
@@ -115,8 +103,6 @@ class ClusterProfiling:
         print(f"Cluster profile saved to {output_path}")
 
         return profile
-
-
 
     # ============================================================
     # Assign Cluster Names
@@ -129,7 +115,7 @@ class ClusterProfiling:
             1: "Defensive Dividend Payers",
             2: "Value Cyclicals",
             3: "Distressed or Turnaround",
-            4: "Emerging Growth"
+            4: "Emerging Growth",
         }
 
         df["cluster_name"] = df["cluster_id"].map(cluster_names)
@@ -137,19 +123,12 @@ class ClusterProfiling:
         output_path = self.output_dir / "cluster_labels.csv"
 
         df[
-            [
-                "company_id",
-                "cluster_id",
-                "cluster_name",
-                "distance_from_centroid"
-            ]
+            ["company_id", "cluster_id", "cluster_name", "distance_from_centroid"]
         ].to_csv(output_path, index=False)
 
         print(f"Updated cluster labels saved to {output_path}")
 
         return df
-
-
 
     # ============================================================
     # Correlation Heatmap
@@ -167,19 +146,14 @@ class ClusterProfiling:
             "interest_coverage",
             "asset_turnover",
             "pat_cagr_5yr",
-            "eps_cagr_5yr"
+            "eps_cagr_5yr",
         ]
 
         corr = df[kpis].corr(method="pearson")
 
         plt.figure(figsize=(10, 8))
 
-        sns.heatmap(
-            corr,
-            annot=True,
-            cmap="coolwarm",
-            fmt=".2f"
-        )
+        sns.heatmap(corr, annot=True, cmap="coolwarm", fmt=".2f")
 
         plt.title("Correlation Matrix")
 
@@ -190,8 +164,6 @@ class ClusterProfiling:
         plt.close()
 
         print(f"Correlation heatmap saved to {output_path}")
-
-
 
     # ============================================================
     # Outlier Detection
@@ -204,7 +176,7 @@ class ClusterProfiling:
             "debt_to_equity",
             "revenue_cagr_5yr",
             "free_cash_flow_cr",
-            "operating_profit_margin_pct"
+            "operating_profit_margin_pct",
         ]
 
         outlier_frames = []
@@ -229,7 +201,6 @@ class ClusterProfiling:
 
         print(f"Outlier report saved to {output_path}")
 
-
     # ============================================================
     # Portfolio Statistics
     # ============================================================
@@ -246,7 +217,7 @@ class ClusterProfiling:
             "interest_coverage",
             "asset_turnover",
             "pat_cagr_5yr",
-            "eps_cagr_5yr"
+            "eps_cagr_5yr",
         ]
 
         stats = pd.DataFrame(index=metrics)
@@ -264,8 +235,6 @@ class ClusterProfiling:
         stats.round(2).to_csv(output_path)
 
         print(f"Portfolio statistics saved to {output_path}")
-
-
 
     # ============================================================
     # Close Database
@@ -295,6 +264,3 @@ if __name__ == "__main__":
     app.generate_portfolio_statistics(df)
 
     app.close()
-
-
-

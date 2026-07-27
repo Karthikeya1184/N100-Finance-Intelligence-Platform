@@ -1,10 +1,6 @@
 from src.analytics.ratios import RatioEngine
 from src.analytics.cashflow_kpis import CashFlowEngine
-from src.analytics.cagr import (
-    revenue_cagr_5yr,
-    pat_cagr_5yr,
-    eps_cagr_5yr
-)
+from src.analytics.cagr import revenue_cagr_5yr, pat_cagr_5yr, eps_cagr_5yr
 
 
 class RatioCalculator:
@@ -15,46 +11,35 @@ class RatioCalculator:
         result = {}
 
         result["net_profit_margin_pct"] = RatioEngine.net_profit_margin(
-            row["net_profit"],
-            row["sales"]
+            row["net_profit"], row["sales"]
         )
 
         result["operating_profit_margin_pct"] = RatioEngine.operating_profit_margin(
-            row["operating_profit"],
-            row["sales"]
+            row["operating_profit"], row["sales"]
         )
 
         result["return_on_equity_pct"] = RatioEngine.roe(
-            row["net_profit"],
-            row["equity_capital"],
-            row["reserves"]
+            row["net_profit"], row["equity_capital"], row["reserves"]
         )
 
         result["debt_to_equity"] = RatioEngine.debt_to_equity(
-            row["borrowings"],
-            row["equity_capital"],
-            row["reserves"]
+            row["borrowings"], row["equity_capital"], row["reserves"]
         )
 
         result["interest_coverage"] = RatioEngine.interest_coverage(
-            row["operating_profit"],
-            row["other_income"],
-            row["interest"]
+            row["operating_profit"], row["other_income"], row["interest"]
         )
 
         result["asset_turnover"] = RatioEngine.asset_turnover(
-            row["sales"],
-            row["total_assets"]
+            row["sales"], row["total_assets"]
         )
 
         result["free_cash_flow_cr"] = CashFlowEngine.free_cash_flow(
-            row["operating_activity"],
-            row["investing_activity"]
+            row["operating_activity"], row["investing_activity"]
         )
 
         result["capex_cr"] = CashFlowEngine.capex_intensity(
-            row["investing_activity"],
-            row["sales"]
+            row["investing_activity"], row["sales"]
         )[0]
 
         result["earnings_per_share"] = row["eps"]
@@ -75,20 +60,11 @@ class RatioCalculator:
 
         if len(sales) >= 6:
 
-            revenue, _ = revenue_cagr_5yr(
-                sales[-6],
-                sales[-1]
-            )
+            revenue, _ = revenue_cagr_5yr(sales[-6], sales[-1])
 
-            pat, _ = pat_cagr_5yr(
-                profit[-6],
-                profit[-1]
-            )
+            pat, _ = pat_cagr_5yr(profit[-6], profit[-1])
 
-            eps_growth, _ = eps_cagr_5yr(
-                eps[-6],
-                eps[-1]
-            )
+            eps_growth, _ = eps_cagr_5yr(eps[-6], eps[-1])
 
         else:
 

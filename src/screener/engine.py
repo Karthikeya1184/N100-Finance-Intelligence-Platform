@@ -7,10 +7,7 @@ class ScreenerEngine:
 
     def __init__(self):
 
-        with open(
-            "src/screener/screener_config.yaml",
-            "r"
-        ) as f:
+        with open("src/screener/screener_config.yaml", "r") as f:
 
             self.config = yaml.safe_load(f)["filters"]
 
@@ -23,7 +20,7 @@ class ScreenerEngine:
             SELECT *
             FROM financial_ratios
             """,
-            self.conn
+            self.conn,
         )
 
         sectors = pd.read_sql(
@@ -33,7 +30,7 @@ class ScreenerEngine:
                 broad_sector
             FROM sectors
             """,
-            self.conn
+            self.conn,
         )
 
         market = pd.read_sql(
@@ -46,7 +43,7 @@ class ScreenerEngine:
                 dividend_yield_pct
             FROM market_cap
             """,
-            self.conn
+            self.conn,
         )
 
         companies = pd.read_sql(
@@ -56,7 +53,7 @@ class ScreenerEngine:
                 company_name
             FROM companies
             """,
-            self.conn
+            self.conn,
         )
 
         pnl = pd.read_sql(
@@ -68,47 +65,21 @@ class ScreenerEngine:
                 net_profit
             FROM profitandloss
             """,
-            self.conn
+            self.conn,
         )
 
-        df = ratios.merge(
-            sectors,
-            on="company_id",
-            how="left"
-        )
+        df = ratios.merge(sectors, on="company_id", how="left")
 
-        df = df.merge(
-            market,
-            on="company_id",
-            how="left"
-        )
+        df = df.merge(market, on="company_id", how="left")
+
+        df = df.merge(companies, left_on="company_id", right_on="id", how="left")
+
+        df.drop(columns=["id"], inplace=True)
 
         df = df.merge(
-            companies,
-            left_on="company_id",
-            right_on="id",
-            how="left"
-        )
-
-        df.drop(
-            columns=["id"],
-            inplace=True
-        )
-
-        df = df.merge(
-            pnl[
-                [
-                    "company_id",
-                    "year",
-                    "sales",
-                    "net_profit"
-                ]
-            ],
-            on=[
-                "company_id",
-                "year"
-            ],
-            how="left"
+            pnl[["company_id", "year", "sales", "net_profit"]],
+            on=["company_id", "year"],
+            how="left",
         )
 
         return df
@@ -123,10 +94,7 @@ class ScreenerEngine:
 
         financials = df["broad_sector"] == "Financials"
 
-        df = df[
-            financials |
-            (df["debt_to_equity"] <= c["debt_to_equity_max"])
-        ]
+        df = df[financials | (df["debt_to_equity"] <= c["debt_to_equity_max"])]
 
         df = df[df["free_cash_flow_cr"] >= c["free_cash_flow_min"]]
 
@@ -134,10 +102,7 @@ class ScreenerEngine:
 
         df = df[df["pat_cagr_5yr"] >= c["pat_cagr_5yr_min"]]
 
-        df = df[
-            df["operating_profit_margin_pct"]
-            >= c["operating_profit_margin_min"]
-        ]
+        df = df[df["operating_profit_margin_pct"] >= c["operating_profit_margin_min"]]
 
         df = df[df["pe_ratio"] <= c["pe_max"]]
 
@@ -159,10 +124,7 @@ class ScreenerEngine:
 
         df = df[df["sales"] >= c["sales_min"]]
 
-        df = df.sort_values(
-            "composite_quality_score",
-            ascending=False
-        )
+        df = df.sort_values("composite_quality_score", ascending=False)
 
         return df
 

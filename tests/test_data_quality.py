@@ -20,32 +20,26 @@ def get_value(query):
 
 def test_positive_sales():
 
-    assert get_value(
-        """
+    assert get_value("""
         SELECT COUNT(*)
         FROM profitandloss
         WHERE sales < 0
-        """
-    ) == 0
+        """) == 0
 
 
 def test_market_cap_positive():
 
-    assert get_value(
-        """
+    assert get_value("""
         SELECT COUNT(*)
         FROM market_cap
         WHERE market_cap_crore < 0
-        """
-    ) == 0
+        """) == 0
 
 
 def test_stock_prices_positive():
 
-    assert get_value(
-        """
+    assert get_value("""
         SELECT COUNT(*)
         FROM stock_prices
         WHERE close_price < 0
-        """
-    ) == 0
+        """) == 0

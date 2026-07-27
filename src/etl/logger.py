@@ -8,9 +8,7 @@ logger = logging.getLogger("ETL")
 
 logger.setLevel(logging.INFO)
 
-formatter = logging.Formatter(
-    "%(asctime)s | %(levelname)s | %(message)s"
-)
+formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
 
 file_handler = logging.FileHandler(LOG_DIR / "etl.log")
 

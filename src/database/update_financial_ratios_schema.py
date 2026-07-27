@@ -6,7 +6,7 @@ NEW_COLUMNS = [
     ("revenue_cagr_5yr", "REAL"),
     ("pat_cagr_5yr", "REAL"),
     ("eps_cagr_5yr", "REAL"),
-    ("composite_quality_score", "INTEGER")
+    ("composite_quality_score", "INTEGER"),
 ]
 
 
@@ -26,12 +26,10 @@ def main():
 
         if not column_exists(cursor, "financial_ratios", column):
 
-            cursor.execute(
-                f"""
+            cursor.execute(f"""
                 ALTER TABLE financial_ratios
                 ADD COLUMN {column} {datatype}
-                """
-            )
+                """)
 
             print(f"Added {column}")
 

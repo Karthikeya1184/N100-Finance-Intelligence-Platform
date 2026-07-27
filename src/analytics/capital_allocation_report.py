@@ -20,9 +20,7 @@ class CapitalAllocationReport:
 
         self.db_path = self.project_root / "db" / "nifty100.db"
 
-        self.capital_file = (
-            self.project_root / "output" / "capital_allocation.csv"
-        )
+        self.capital_file = self.project_root / "output" / "capital_allocation.csv"
 
         self.cashflow_excel = (
             self.project_root / "output" / "cashflow_intelligence.xlsx"
@@ -43,9 +41,7 @@ class CapitalAllocationReport:
     def load_capital_data(self):
 
         if not self.capital_file.exists():
-            raise FileNotFoundError(
-                f"Missing file: {self.capital_file}"
-            )
+            raise FileNotFoundError(f"Missing file: {self.capital_file}")
 
         df = pd.read_csv(self.capital_file)
 
@@ -78,9 +74,7 @@ class CapitalAllocationReport:
         print(f"Companies           : {df['company_id'].nunique()}")
         print(f"Years               : {df['year'].nunique()}")
 
-        duplicates = df.duplicated(
-            subset=["company_id", "year"]
-        ).sum()
+        duplicates = df.duplicated(subset=["company_id", "year"]).sum()
 
         print(f"Duplicate rows      : {duplicates}")
 
@@ -104,14 +98,12 @@ class CapitalAllocationReport:
 
         latest = (
             df.sort_values(["company_id", "year"])
-              .groupby("company_id")
-              .tail(1)
-              .reset_index(drop=True)
+            .groupby("company_id")
+            .tail(1)
+            .reset_index(drop=True)
         )
 
         return latest
-    
-
 
     # --------------------------------------------------------
     # Distribution summary
@@ -127,9 +119,7 @@ class CapitalAllocationReport:
             .sort_values("company_count", ascending=False)
         )
 
-        summary_path = (
-            self.output_dir / "capital_allocation_summary.csv"
-        )
+        summary_path = self.output_dir / "capital_allocation_summary.csv"
 
         summary.to_csv(summary_path, index=False)
 
@@ -145,39 +135,22 @@ class CapitalAllocationReport:
 
         df = df.sort_values(["company_id", "year"])
 
-        previous = (
-            df.groupby("company_id")["pattern_label"]
-            .shift(1)
-        )
+        previous = df.groupby("company_id")["pattern_label"].shift(1)
 
         changes = df.copy()
 
         changes["previous_pattern"] = previous
 
-        changes["changed"] = (
-            changes["previous_pattern"]
-            != changes["pattern_label"]
-        )
+        changes["changed"] = changes["previous_pattern"] != changes["pattern_label"]
 
-        latest_changes = (
-            changes.groupby("company_id")
-            .tail(1)
-            .copy()
-        )
+        latest_changes = changes.groupby("company_id").tail(1).copy()
 
         companies = self.load_companies()
 
-        latest_changes = latest_changes.merge(
-            companies,
-            on="company_id",
-            how="left"
-        )
+        latest_changes = latest_changes.merge(companies, on="company_id", how="left")
 
         latest_changes.rename(
-            columns={
-                "pattern_label": "current_pattern"
-            },
-            inplace=True
+            columns={"pattern_label": "current_pattern"}, inplace=True
         )
 
         latest_changes = latest_changes[
@@ -190,19 +163,13 @@ class CapitalAllocationReport:
             ]
         ]
 
-        latest_changes["changed"] = (
-            latest_changes["changed"]
-            .map({True: "Yes", False: "No"})
+        latest_changes["changed"] = latest_changes["changed"].map(
+            {True: "Yes", False: "No"}
         )
 
-        output_path = (
-            self.output_dir / "pattern_changes.csv"
-        )
+        output_path = self.output_dir / "pattern_changes.csv"
 
-        latest_changes.to_csv(
-            output_path,
-            index=False
-        )
+        latest_changes.to_csv(output_path, index=False)
 
         print(f"✓ Pattern changes saved: {output_path}")
 
@@ -222,9 +189,6 @@ class CapitalAllocationReport:
 
         print("=" * 60)
 
-
-
-
     # --------------------------------------------------------
     # Update Cash Flow Intelligence Workbook
     # --------------------------------------------------------
@@ -232,34 +196,19 @@ class CapitalAllocationReport:
     def update_cashflow_excel(self, latest_df):
 
         if not self.cashflow_excel.exists():
-            raise FileNotFoundError(
-                f"Missing file: {self.cashflow_excel}"
-            )
+            raise FileNotFoundError(f"Missing file: {self.cashflow_excel}")
 
         excel_df = pd.read_excel(self.cashflow_excel)
 
-        latest_df = latest_df[
-            ["company_id", "pattern_label"]
-        ].rename(
-            columns={
-                "pattern_label": "capital_allocation_pattern"
-            }
+        latest_df = latest_df[["company_id", "pattern_label"]].rename(
+            columns={"pattern_label": "capital_allocation_pattern"}
         )
 
-        updated = excel_df.merge(
-            latest_df,
-            on="company_id",
-            how="left"
-        )
+        updated = excel_df.merge(latest_df, on="company_id", how="left")
 
-        updated.to_excel(
-            self.cashflow_excel,
-            index=False
-        )
+        updated.to_excel(self.cashflow_excel, index=False)
 
-        print(
-            f"✓ Updated workbook: {self.cashflow_excel}"
-        )
+        print(f"✓ Updated workbook: {self.cashflow_excel}")
 
     # --------------------------------------------------------
     # Run Day 32
@@ -273,9 +222,7 @@ class CapitalAllocationReport:
 
         latest_df = self.latest_patterns(capital_df)
 
-        summary = self.generate_distribution_summary(
-            latest_df
-        )
+        summary = self.generate_distribution_summary(latest_df)
 
         self.generate_pattern_changes(capital_df)
 
@@ -293,7 +240,6 @@ class CapitalAllocationReport:
         print("✓ output/capital_allocation_summary.csv")
         print("✓ output/pattern_changes.csv")
         print("✓ output/cashflow_intelligence.xlsx")
-
 
 
 if __name__ == "__main__":

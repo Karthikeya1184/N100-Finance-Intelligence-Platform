@@ -15,24 +15,12 @@ class LoadAudit:
 
     def add(self, table, rows_loaded, rejected):
 
-        self.records.append({
-
-            "table": table,
-
-            "rows_loaded": rows_loaded,
-
-            "rows_rejected": rejected
-
-        })
+        self.records.append(
+            {"table": table, "rows_loaded": rows_loaded, "rows_rejected": rejected}
+        )
 
     def save(self):
 
         df = pd.DataFrame(self.records)
 
-        df.to_csv(
-
-            OUTPUT / "load_audit.csv",
-
-            index=False
-
-        )
+        df.to_csv(OUTPUT / "load_audit.csv", index=False)

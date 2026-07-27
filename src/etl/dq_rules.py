@@ -14,8 +14,9 @@ def create_result(rule, severity, table, rows, message):
         "severity": severity,
         "table": table,
         "failed_rows": rows,
-        "message": message
+        "message": message,
     }
+
 
 def dq01_company_pk(df):
 
@@ -24,14 +25,11 @@ def dq01_company_pk(df):
     if duplicates > 0:
 
         return create_result(
-            "DQ01",
-            "CRITICAL",
-            "companies",
-            duplicates,
-            "Duplicate Company IDs found."
+            "DQ01", "CRITICAL", "companies", duplicates, "Duplicate Company IDs found."
         )
 
     return None
+
 
 def dq02_company_name(df):
 
@@ -40,14 +38,11 @@ def dq02_company_name(df):
     if missing > 0:
 
         return create_result(
-            "DQ02",
-            "CRITICAL",
-            "companies",
-            missing,
-            "Company Name is missing."
+            "DQ02", "CRITICAL", "companies", missing, "Company Name is missing."
         )
 
     return None
+
 
 def dq03_positive_sales(df):
 
@@ -59,12 +54,7 @@ def dq03_positive_sales(df):
     if failed > 0:
 
         return create_result(
-            "DQ03",
-            "WARNING",
-            "profitandloss",
-            failed,
-            "Sales should be positive."
+            "DQ03", "WARNING", "profitandloss", failed, "Sales should be positive."
         )
 
     return None
-

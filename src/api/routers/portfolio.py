@@ -13,6 +13,7 @@ DB_PATH = PROJECT_ROOT / "db" / "nifty100.db"
 def get_connection():
     return sqlite3.connect(DB_PATH)
 
+
 @router.get("/stats")
 def portfolio_stats():
 
@@ -20,8 +21,7 @@ def portfolio_stats():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
 
             AVG(return_on_equity_pct) AS avg_roe,
@@ -40,8 +40,7 @@ def portfolio_stats():
             FROM financial_ratios fr2
             WHERE fr2.company_id = financial_ratios.company_id
         )
-        """
-    )
+        """)
 
     stats = dict(cursor.fetchone())
 

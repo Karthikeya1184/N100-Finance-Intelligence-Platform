@@ -18,6 +18,7 @@ def get_connection():
 # GET /peers/{group_name}
 # ============================================================
 
+
 @router.get("/{group_name}")
 def get_peer_group(group_name: str):
 
@@ -32,15 +33,12 @@ def get_peer_group(group_name: str):
         FROM peer_groups
         WHERE peer_group = ?
         """,
-        (group_name,)
+        (group_name,),
     )
 
     if cursor.fetchone()[0] == 0:
         conn.close()
-        raise HTTPException(
-            status_code=404,
-            detail="Peer group not found"
-        )
+        raise HTTPException(status_code=404, detail="Peer group not found")
 
     query = """
     SELECT
@@ -90,6 +88,7 @@ def get_peer_group(group_name: str):
 # GET /companies/{ticker}/peers/compare
 # ============================================================
 
+
 @router.get("/companies/{ticker}/peers/compare")
 def compare_with_peers(ticker: str):
 
@@ -104,17 +103,14 @@ def compare_with_peers(ticker: str):
         FROM peer_groups
         WHERE company_id = ?
         """,
-        (ticker.upper(),)
+        (ticker.upper(),),
     )
 
     peer = cursor.fetchone()
 
     if peer is None:
         conn.close()
-        raise HTTPException(
-            status_code=404,
-            detail="Peer group not found"
-        )
+        raise HTTPException(status_code=404, detail="Peer group not found")
 
     peer_group = peer["peer_group"]
 
@@ -135,7 +131,7 @@ def compare_with_peers(ticker: str):
         ORDER BY year DESC
         LIMIT 1
         """,
-        (ticker.upper(),)
+        (ticker.upper(),),
     )
 
     company = dict(cursor.fetchone())
@@ -162,7 +158,7 @@ def compare_with_peers(ticker: str):
                 WHERE company_id = fr.company_id
           )
         """,
-        (peer_group,)
+        (peer_group,),
     )
 
     peer_average = dict(cursor.fetchone())
@@ -185,7 +181,7 @@ def compare_with_peers(ticker: str):
         ORDER BY composite_quality_score DESC
         LIMIT 1
         """,
-        (peer_group,)
+        (peer_group,),
     )
 
     benchmark = dict(cursor.fetchone())
@@ -196,5 +192,5 @@ def compare_with_peers(ticker: str):
         "peer_group": peer_group,
         "company": company,
         "peer_average": peer_average,
-        "benchmark": benchmark
+        "benchmark": benchmark,
     }

@@ -2,7 +2,6 @@ class CAGRCalculator:
 
     @staticmethod
     def calculate(start, end, years):
-
         """
         CAGR Formula
 
@@ -43,7 +42,9 @@ def pat_cagr(start, end, years):
 def eps_cagr(start, end, years):
     return CAGRCalculator.calculate(start, end, years)
 
+
 # Revenue CAGR
+
 
 def revenue_cagr_3yr(start, end):
     return revenue_cagr(start, end, 3)
@@ -59,6 +60,7 @@ def revenue_cagr_10yr(start, end):
 
 # PAT CAGR
 
+
 def pat_cagr_3yr(start, end):
     return pat_cagr(start, end, 3)
 
@@ -72,6 +74,7 @@ def pat_cagr_10yr(start, end):
 
 
 # EPS CAGR
+
 
 def eps_cagr_3yr(start, end):
     return eps_cagr(start, end, 3)

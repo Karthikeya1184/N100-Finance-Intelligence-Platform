@@ -1,5 +1,7 @@
 import re
 import pandas as pd
+
+
 def normalize_year(year):
     """
     Converts year values into integer format.
@@ -28,6 +30,7 @@ def normalize_year(year):
         return int("20" + year[-2:])
 
     return None
+
 
 def normalize_ticker(name):
 

@@ -2,6 +2,7 @@ class ETLError(Exception):
     """
     Base ETL Exception
     """
+
     pass
 
 

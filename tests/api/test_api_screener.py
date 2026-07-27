@@ -24,4 +24,3 @@ def test_screener_invalid_parameter():
     response = client.get("/api/v1/screener?min_roe=abc")
 
     assert response.status_code == 422
-    

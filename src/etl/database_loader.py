@@ -25,7 +25,7 @@ def create_database():
         "financial_ratios",
         "market_cap",
         "peer_groups",
-        "stock_prices"
+        "stock_prices",
     ]
 
     audit = []
@@ -36,17 +36,9 @@ def create_database():
 
         df = datasets[table]
 
-        df.to_sql(
-            table,
-            conn,
-            if_exists="replace",
-            index=False
-        )
+        df.to_sql(table, conn, if_exists="replace", index=False)
 
-        audit.append({
-            "table": table,
-            "rows_loaded": len(df)
-        })
+        audit.append({"table": table, "rows_loaded": len(df)})
 
         print(f"Loaded {len(df)} rows")
 
@@ -55,10 +47,7 @@ def create_database():
     output = PROJECT_ROOT / "output"
     output.mkdir(exist_ok=True)
 
-    audit_df.to_csv(
-        output / "load_audit.csv",
-        index=False
-    )
+    audit_df.to_csv(output / "load_audit.csv", index=False)
 
     conn.close()
 

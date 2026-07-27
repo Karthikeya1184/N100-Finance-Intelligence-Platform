@@ -15,18 +15,16 @@ def get_connection():
     return sqlite3.connect(DB_PATH)
 
 
-
 # ============================================================
 # GET /companies
 # ============================================================
 
+
 @router.get("")
 def get_companies(
-
     sector: str | None = Query(default=None),
     market_cap_category: str | None = Query(default=None),
     search: str | None = Query(default=None),
-
 ):
 
     conn = get_connection()
@@ -91,10 +89,10 @@ def get_companies(
     return [dict(row) for row in rows]
 
 
-
 # ============================================================
 # GET /companies/{ticker}
 # ============================================================
+
 
 @router.get("/{ticker}")
 def get_company(ticker: str):
@@ -151,18 +149,15 @@ def get_company(ticker: str):
 
     if row is None:
 
-        raise HTTPException(
-            status_code=404,
-            detail="Company not found"
-        )
+        raise HTTPException(status_code=404, detail="Company not found")
 
     return dict(row)
-
 
 
 # ============================================================
 # GET /companies/{ticker}/pl
 # ============================================================
+
 
 @router.get("/{ticker}/pl")
 def get_profit_and_loss(
@@ -202,10 +197,10 @@ def get_profit_and_loss(
     return [dict(row) for row in rows]
 
 
-
 # ============================================================
 # GET /companies/{ticker}/bs
 # ============================================================
+
 
 @router.get("/{ticker}/bs")
 def get_balance_sheet(
@@ -245,10 +240,10 @@ def get_balance_sheet(
     return [dict(row) for row in rows]
 
 
-
 # ============================================================
 # GET /companies/{ticker}/cashflow
 # ============================================================
+
 
 @router.get("/{ticker}/cashflow")
 def get_cashflow(
@@ -288,10 +283,10 @@ def get_cashflow(
     return [dict(row) for row in rows]
 
 
-
 # ============================================================
 # GET /companies/{ticker}/ratios
 # ============================================================
+
 
 @router.get("/{ticker}/ratios")
 def get_ratios(
@@ -330,27 +325,21 @@ def get_ratios(
     return [dict(row) for row in rows]
 
 
-
 # ============================================================
 # GET /companies/{ticker}/tearsheet
 # ============================================================
+
 
 @router.get("/{ticker}/tearsheet")
 def download_tearsheet(ticker: str):
 
     pdf_path = (
-        PROJECT_ROOT
-        / "output"
-        / "tearsheets"
-        / f"{ticker.upper()}_tearsheet.pdf"
+        PROJECT_ROOT / "output" / "tearsheets" / f"{ticker.upper()}_tearsheet.pdf"
     )
 
     if not pdf_path.exists():
 
-        raise HTTPException(
-            status_code=404,
-            detail="Tearsheet not found"
-        )
+        raise HTTPException(status_code=404, detail="Tearsheet not found")
 
     return FileResponse(
         path=pdf_path,

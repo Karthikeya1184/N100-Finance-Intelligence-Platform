@@ -2,7 +2,6 @@ from pathlib import Path
 
 
 def ensure_directory(path: Path):
-
     """
     Create directory if it doesn't exist.
     """
@@ -11,7 +10,6 @@ def ensure_directory(path: Path):
 
 
 def file_exists(path: Path):
-
     """
     Check whether a file exists.
     """

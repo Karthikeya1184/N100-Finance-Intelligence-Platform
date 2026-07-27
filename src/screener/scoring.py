@@ -37,7 +37,7 @@ class CompositeScorer:
             "revenue_cagr_5yr",
             "pat_cagr_5yr",
             "debt_to_equity",
-            "interest_coverage"
+            "interest_coverage",
         ]
 
         for m in metrics:
@@ -49,53 +49,29 @@ class CompositeScorer:
         # Profitability
 
         profitability = (
-
-    df["return_on_equity_pct_score"] * 0.25 +
-
-    df["net_profit_margin_pct_score"] * 0.10
-
-)
+            df["return_on_equity_pct_score"] * 0.25
+            + df["net_profit_margin_pct_score"] * 0.10
+        )
 
         # Cash Quality
 
         cash = (
-
-            df["free_cash_flow_cr_score"] * 0.20 +
-
-            df["cash_from_operations_cr_score"] * 0.10
-
+            df["free_cash_flow_cr_score"] * 0.20
+            + df["cash_from_operations_cr_score"] * 0.10
         )
 
         # Growth
 
-        growth = (
-
-            df["revenue_cagr_5yr_score"] * 0.10 +
-
-            df["pat_cagr_5yr_score"] * 0.10
-
-        )
+        growth = df["revenue_cagr_5yr_score"] * 0.10 + df["pat_cagr_5yr_score"] * 0.10
 
         # Leverage
 
-        leverage = (
-
-            (100 - df["debt_to_equity_score"]) * 0.10 +
-
-            df["interest_coverage_score"] * 0.05
-
-        )
+        leverage = (100 - df["debt_to_equity_score"]) * 0.10 + df[
+            "interest_coverage_score"
+        ] * 0.05
 
         df["composite_quality_score"] = (
-
-            profitability +
-
-            cash +
-
-            growth +
-
-            leverage
-
+            profitability + cash + growth + leverage
         ).round(2)
 
         return df

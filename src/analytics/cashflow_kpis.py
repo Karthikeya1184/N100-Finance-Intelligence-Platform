@@ -118,10 +118,7 @@ class CashFlowEngine:
         if pd.isna(previous_borrowings):
             return False
 
-        return (
-            cff < 0
-            and latest_borrowings < previous_borrowings
-        )
+        return cff < 0 and latest_borrowings < previous_borrowings
 
     @staticmethod
     def fcf_cagr(start_fcf, end_fcf, years=5):
@@ -142,7 +139,7 @@ class CashFlowEngine:
             (((end_fcf / start_fcf) ** (1 / years)) - 1) * 100,
             2,
         )
-    
+
 
 class CashFlowIntelligence:
 
@@ -212,7 +209,6 @@ class CashFlowIntelligence:
         df = pd.read_sql(query, self.conn)
 
         return df
-    
 
     def prepare_company_data(self):
 
@@ -226,97 +222,58 @@ class CashFlowIntelligence:
 
             latest = group.iloc[-1]
 
-            previous = (
-                group.iloc[-2]
-                if len(group) > 1
-                else latest
-            )
+            previous = group.iloc[-2] if len(group) > 1 else latest
 
             fcf_series = []
 
             for _, row in group.iterrows():
 
                 fcf = self.engine.free_cash_flow(
-
-                    row["operating_activity"],
-                    row["investing_activity"]
-
+                    row["operating_activity"], row["investing_activity"]
                 )
 
                 fcf_series.append(fcf)
 
             quality_score, quality_label = self.engine.cfo_quality_score(
-
-                group["operating_activity"].tolist(),
-
-                group["net_profit"].tolist()
-
+                group["operating_activity"].tolist(), group["net_profit"].tolist()
             )
 
             latest_fcf = fcf_series[-1]
 
             capex_pct, capex_label = self.engine.capex_intensity(
-
-                latest["investing_activity"],
-
-                latest["sales"]
-
+                latest["investing_activity"], latest["sales"]
             )
 
             if len(fcf_series) >= 6:
 
-                fcf_cagr = self.engine.fcf_cagr(
-
-                    fcf_series[-6],
-
-                    fcf_series[-1],
-
-                    5
-
-                )
+                fcf_cagr = self.engine.fcf_cagr(fcf_series[-6], fcf_series[-1], 5)
 
             else:
 
                 fcf_cagr = None
 
-            companies.append({
-
-                "company_id": company_id,
-
-                "company_name": latest["company_name"],
-
-                "sector": latest["broad_sector"],
-
-                "quality_score": quality_score,
-
-                "quality_label": quality_label,
-
-                "capex_pct": capex_pct,
-
-                "capex_label": capex_label,
-
-                "latest_cfo": latest["operating_activity"],
-
-                "latest_cfi": latest["investing_activity"],
-
-                "latest_cff": latest["financing_activity"],
-
-                "latest_fcf": latest_fcf,
-
-                "latest_pat": latest["net_profit"],
-
-                "operating_profit": latest["operating_profit"],
-
-                "borrowings": latest["borrowings"],
-
-                "previous_borrowings": previous["borrowings"],
-
-                "fcf_cagr": fcf_cagr
-
-            })
+            companies.append(
+                {
+                    "company_id": company_id,
+                    "company_name": latest["company_name"],
+                    "sector": latest["broad_sector"],
+                    "quality_score": quality_score,
+                    "quality_label": quality_label,
+                    "capex_pct": capex_pct,
+                    "capex_label": capex_label,
+                    "latest_cfo": latest["operating_activity"],
+                    "latest_cfi": latest["investing_activity"],
+                    "latest_cff": latest["financing_activity"],
+                    "latest_fcf": latest_fcf,
+                    "latest_pat": latest["net_profit"],
+                    "operating_profit": latest["operating_profit"],
+                    "borrowings": latest["borrowings"],
+                    "previous_borrowings": previous["borrowings"],
+                    "fcf_cagr": fcf_cagr,
+                }
+            )
 
         return pd.DataFrame(companies)
-    
 
     def generate_reports(self):
 
@@ -328,30 +285,14 @@ class CashFlowIntelligence:
 
         for _, row in df.iterrows():
 
-            distress = self.engine.distress_signal(
-
-                row["latest_cfo"],
-
-                row["latest_cff"]
-
-            )
+            distress = self.engine.distress_signal(row["latest_cfo"], row["latest_cff"])
 
             deleveraging = self.engine.deleveraging(
-
-                row["latest_cff"],
-
-                row["borrowings"],
-
-                row["previous_borrowings"]
-
+                row["latest_cff"], row["borrowings"], row["previous_borrowings"]
             )
 
             fcf_conversion = self.engine.fcf_conversion(
-
-                row["latest_fcf"],
-
-                row["operating_profit"]
-
+                row["latest_fcf"], row["operating_profit"]
             )
 
             if distress:
@@ -370,69 +311,42 @@ class CashFlowIntelligence:
 
                 capital_label = "Balanced"
 
-            final_rows.append({
-
-                "company_id": row["company_id"],
-
-                "company_name": row["company_name"],
-
-                "sector": row["sector"],
-
-                "cfo_quality_score": row["quality_score"],
-
-                "cfo_quality_label": row["quality_label"],
-
-                "capex_intensity_pct": row["capex_pct"],
-
-                "capex_label": row["capex_label"],
-
-                "fcf_cagr_5yr": row["fcf_cagr"],
-
-                "fcf_conversion_pct": fcf_conversion,
-
-                "distress_flag": distress,
-
-                "deleveraging_flag": deleveraging,
-
-                "capital_allocation_label": capital_label
-
-            })
+            final_rows.append(
+                {
+                    "company_id": row["company_id"],
+                    "company_name": row["company_name"],
+                    "sector": row["sector"],
+                    "cfo_quality_score": row["quality_score"],
+                    "cfo_quality_label": row["quality_label"],
+                    "capex_intensity_pct": row["capex_pct"],
+                    "capex_label": row["capex_label"],
+                    "fcf_cagr_5yr": row["fcf_cagr"],
+                    "fcf_conversion_pct": fcf_conversion,
+                    "distress_flag": distress,
+                    "deleveraging_flag": deleveraging,
+                    "capital_allocation_label": capital_label,
+                }
+            )
 
             if distress:
 
-                distress_rows.append({
-
-                    "company_id": row["company_id"],
-
-                    "company_name": row["company_name"],
-
-                    "CFO": row["latest_cfo"],
-
-                    "CFF": row["latest_cff"],
-
-                    "latest_net_profit": row["latest_pat"]
-
-                })
+                distress_rows.append(
+                    {
+                        "company_id": row["company_id"],
+                        "company_name": row["company_name"],
+                        "CFO": row["latest_cfo"],
+                        "CFF": row["latest_cff"],
+                        "latest_net_profit": row["latest_pat"],
+                    }
+                )
 
         final_df = pd.DataFrame(final_rows)
 
         distress_df = pd.DataFrame(distress_rows)
 
-        final_df.to_excel(
+        final_df.to_excel("output/cashflow_intelligence.xlsx", index=False)
 
-            "output/cashflow_intelligence.xlsx",
-
-            index=False
-
-        )
-
-        distress_df.to_csv(
-
-            "output/distress_alerts.csv",
-
-            index=False
-
-        )
+        distress_df.to_csv("output/distress_alerts.csv", index=False)
 
         print("\n" + "=" * 60)
         print("DAY 31 COMPLETED")

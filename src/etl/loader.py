@@ -23,6 +23,7 @@ SUPPORT_FILES = {
 
 from pathlib import Path
 
+
 def load_excel(path, header):
     """
     Load a single Excel file.

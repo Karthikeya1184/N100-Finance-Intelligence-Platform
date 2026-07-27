@@ -15,35 +15,25 @@ def generate():
     for _, row in cashflow.iterrows():
 
         signs, pattern = CashFlowEngine.capital_pattern(
-
             row["operating_activity"],
             row["investing_activity"],
-            row["financing_activity"]
-
+            row["financing_activity"],
         )
 
-        rows.append({
-
-            "company_id": row["company_id"],
-
-            "year": row["year"],
-
-            "cfo_sign": signs[0],
-
-            "cfi_sign": signs[1],
-
-            "cff_sign": signs[2],
-
-            "pattern_label": pattern
-
-        })
+        rows.append(
+            {
+                "company_id": row["company_id"],
+                "year": row["year"],
+                "cfo_sign": signs[0],
+                "cfi_sign": signs[1],
+                "cff_sign": signs[2],
+                "pattern_label": pattern,
+            }
+        )
 
     df = pd.DataFrame(rows)
 
-    df.to_csv(
-        "output/capital_allocation.csv",
-        index=False
-    )
+    df.to_csv("output/capital_allocation.csv", index=False)
 
     print(df.head())
 

@@ -30,7 +30,7 @@ def get_documents(ticker: str):
         WHERE company_id = ?
         ORDER BY document_name
         """,
-        (ticker.upper(),)
+        (ticker.upper(),),
     )
 
     rows = cursor.fetchall()
@@ -42,9 +42,8 @@ def get_documents(ticker: str):
     for row in rows:
         item = dict(row)
         url = item.get("document_url")
-        item["is_url_valid"] = (
-            isinstance(url, str)
-            and url.startswith(("http://", "https://"))
+        item["is_url_valid"] = isinstance(url, str) and url.startswith(
+            ("http://", "https://")
         )
         results.append(item)
 

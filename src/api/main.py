@@ -15,7 +15,6 @@ from src.api.routers import (
     health,
 )
 
-
 # ============================================================
 # FastAPI Application
 # ============================================================
@@ -23,7 +22,7 @@ from src.api.routers import (
 app = FastAPI(
     title="N100 Finance Intelligence Platform API",
     version="1.0.0",
-    description="Sprint 6 FastAPI Backend"
+    description="Sprint 6 FastAPI Backend",
 )
 
 
@@ -58,6 +57,7 @@ app.add_middleware(
 # Request Logging Middleware
 # ============================================================
 
+
 @app.middleware("http")
 async def log_requests(request, call_next):
 
@@ -67,14 +67,9 @@ async def log_requests(request, call_next):
 
     elapsed_ms = (time.perf_counter() - start_time) * 1000
 
-    print(
-        f"{request.method} "
-        f"{request.url.path} "
-        f"{elapsed_ms:.2f} ms"
-    )
+    print(f"{request.method} " f"{request.url.path} " f"{elapsed_ms:.2f} ms")
 
     return response
-
 
 
 app.include_router(

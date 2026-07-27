@@ -75,10 +75,7 @@ class PeerEngine:
                 if metric not in peer_df.columns:
                     continue
 
-                ranks = peer_df[metric].rank(
-                    pct=True,
-                    method="average"
-                )
+                ranks = peer_df[metric].rank(pct=True, method="average")
 
                 # Lower D/E is better
                 if metric == "debt_to_equity":
@@ -86,41 +83,20 @@ class PeerEngine:
 
                 for idx in peer_df.index:
 
-                    output.append({
-
-                        "company_id":
-                            peer_df.loc[idx, "company_id"],
-
-                        "peer_group_name":
-                            group,
-
-                        "metric":
-                            metric,
-
-                        "value":
-                            peer_df.loc[idx, metric],
-
-                        "percentile_rank":
-                            round(ranks.loc[idx], 4),
-
-                        "year":
-                            peer_df.loc[idx, "year"]
-
-                    })
+                    output.append(
+                        {
+                            "company_id": peer_df.loc[idx, "company_id"],
+                            "peer_group_name": group,
+                            "metric": metric,
+                            "value": peer_df.loc[idx, metric],
+                            "percentile_rank": round(ranks.loc[idx], 4),
+                            "year": peer_df.loc[idx, "year"],
+                        }
+                    )
 
         result = pd.DataFrame(output)
 
-        result.to_sql(
-
-            "peer_percentiles",
-
-            self.conn,
-
-            if_exists="replace",
-
-            index=False
-
-        )
+        result.to_sql("peer_percentiles", self.conn, if_exists="replace", index=False)
 
         print("\nPeer Percentiles Created Successfully")
 

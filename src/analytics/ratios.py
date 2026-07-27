@@ -29,10 +29,7 @@ class RatioEngine:
             return
 
         with open(logfile, "a") as f:
-            f.write(
-                f"{company},{year},Calculated={calculated},"
-                f"Source={source}\n"
-            )
+            f.write(f"{company},{year},Calculated={calculated}," f"Source={source}\n")
 
     @staticmethod
     def roe(net_profit, equity, reserves):

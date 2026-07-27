@@ -9,15 +9,9 @@ class ScreenerExporter:
 
         wb = load_workbook(filename)
 
-        green = PatternFill(
-            fill_type="solid",
-            fgColor="90EE90"
-        )
+        green = PatternFill(fill_type="solid", fgColor="90EE90")
 
-        red = PatternFill(
-            fill_type="solid",
-            fgColor="FFC7CE"
-        )
+        red = PatternFill(fill_type="solid", fgColor="FFC7CE")
 
         for ws in wb.worksheets:
 

@@ -5,35 +5,19 @@ FILE = "output/peer_comparison.xlsx"
 
 wb = load_workbook(FILE)
 
-green = PatternFill(
-    fill_type="solid",
-    fgColor="90EE90"
-)
+green = PatternFill(fill_type="solid", fgColor="90EE90")
 
-yellow = PatternFill(
-    fill_type="solid",
-    fgColor="FFF59D"
-)
+yellow = PatternFill(fill_type="solid", fgColor="FFF59D")
 
-red = PatternFill(
-    fill_type="solid",
-    fgColor="FFCDD2"
-)
+red = PatternFill(fill_type="solid", fgColor="FFCDD2")
 
-gold = PatternFill(
-    fill_type="solid",
-    fgColor="FFD54F"
-)
+gold = PatternFill(fill_type="solid", fgColor="FFD54F")
 
 for ws in wb.worksheets:
 
     headers = [c.value for c in ws[1]]
 
-    percentile_cols = [
-        i + 1
-        for i, h in enumerate(headers)
-        if str(h).endswith("_pct")
-    ]
+    percentile_cols = [i + 1 for i, h in enumerate(headers) if str(h).endswith("_pct")]
 
     company_col = headers.index("company_id") + 1
 

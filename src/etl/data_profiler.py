@@ -20,12 +20,14 @@ def profile_excel(file_path, header=0):
 
     print("\nCOLUMN INFORMATION\n")
 
-    summary = pd.DataFrame({
-        "Column": df.columns,
-        "Datatype": df.dtypes.astype(str),
-        "Missing": df.isna().sum().values,
-        "Unique": df.nunique().values
-    })
+    summary = pd.DataFrame(
+        {
+            "Column": df.columns,
+            "Datatype": df.dtypes.astype(str),
+            "Missing": df.isna().sum().values,
+            "Unique": df.nunique().values,
+        }
+    )
 
     print(summary)
 

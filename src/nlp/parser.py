@@ -16,9 +16,7 @@ class AnalysisParser:
 
         self.output.mkdir(exist_ok=True)
 
-        self.pattern = re.compile(
-            r"(\d+)\s*Years?:?\s*([\d.]+)%"
-        )
+        self.pattern = re.compile(r"(\d+)\s*Years?:?\s*([\d.]+)%")
 
     def load_data(self):
 
@@ -34,12 +32,7 @@ class AnalysisParser:
 
         return pd.read_sql(query, self.conn)
 
-    def parse_metric(
-        self,
-        company_id,
-        metric_name,
-        text
-    ):
+    def parse_metric(self, company_id, metric_name, text):
 
         if pd.isna(text):
 
@@ -57,22 +50,16 @@ class AnalysisParser:
 
         for period, value in matches:
 
-            parsed.append({
-
-                "company_id": company_id,
-
-                "metric_type": metric_name,
-
-                "period_years": int(period),
-
-                "value_pct": float(value)
-
-            })
+            parsed.append(
+                {
+                    "company_id": company_id,
+                    "metric_type": metric_name,
+                    "period_years": int(period),
+                    "value_pct": float(value),
+                }
+            )
 
         return parsed, True
-    
-
-
 
     def parse(self):
 
@@ -86,7 +73,7 @@ class AnalysisParser:
             "compounded_sales_growth",
             "compounded_profit_growth",
             "stock_price_cagr",
-            "roe"
+            "roe",
         ]
 
         for _, row in df.iterrows():
@@ -97,11 +84,7 @@ class AnalysisParser:
 
                 text = row[metric]
 
-                values, success = self.parse_metric(
-                    company,
-                    metric,
-                    text
-                )
+                values, success = self.parse_metric(company, metric, text)
 
                 if success:
 
@@ -109,15 +92,9 @@ class AnalysisParser:
 
                 else:
 
-                    failed_rows.append({
-
-                        "company_id": company,
-
-                        "metric_type": metric,
-
-                        "raw_text": text
-
-                    })
+                    failed_rows.append(
+                        {"company_id": company, "metric_type": metric, "raw_text": text}
+                    )
 
         # ---------------------------------
         # Parsed DataFrame
@@ -125,12 +102,7 @@ class AnalysisParser:
 
         parsed_df = pd.DataFrame(
             parsed_rows,
-            columns=[
-                "company_id",
-                "metric_type",
-                "period_years",
-                "value_pct"
-            ]
+            columns=["company_id", "metric_type", "period_years", "value_pct"],
         )
 
         # ---------------------------------
@@ -138,29 +110,12 @@ class AnalysisParser:
         # ---------------------------------
 
         failure_df = pd.DataFrame(
-            failed_rows,
-            columns=[
-                "company_id",
-                "metric_type",
-                "raw_text"
-            ]
+            failed_rows, columns=["company_id", "metric_type", "raw_text"]
         )
 
-        parsed_df.to_csv(
+        parsed_df.to_csv(self.output / "analysis_parsed.csv", index=False)
 
-            self.output / "analysis_parsed.csv",
-
-            index=False
-
-        )
-
-        failure_df.to_csv(
-
-            self.output / "parse_failures.csv",
-
-            index=False
-
-        )
+        failure_df.to_csv(self.output / "parse_failures.csv", index=False)
 
         print()
 
@@ -179,8 +134,6 @@ class AnalysisParser:
         print()
 
         return parsed_df
-    
-
 
     def validate(self, parsed_df):
 
@@ -194,14 +147,11 @@ class AnalysisParser:
                     "metric_type",
                     "value_pct",
                     "expected_value",
-                    "difference_pct"
+                    "difference_pct",
                 ]
             )
 
-            review.to_csv(
-                self.output / "manual_review.csv",
-                index=False
-            )
+            review.to_csv(self.output / "manual_review.csv", index=False)
 
             return review
 
@@ -214,45 +164,32 @@ class AnalysisParser:
                 return_on_equity_pct
             FROM financial_ratios
             """,
-            self.conn
+            self.conn,
         )
 
-        compare = parsed_df.merge(
-            ratios,
-            on="company_id",
-            how="left"
-        )
+        compare = parsed_df.merge(ratios, on="company_id", how="left")
 
         compare["expected_value"] = None
 
         compare.loc[
-            compare["metric_type"] == "compounded_sales_growth",
-            "expected_value"
+            compare["metric_type"] == "compounded_sales_growth", "expected_value"
         ] = compare["revenue_cagr_5yr"]
 
         compare.loc[
-            compare["metric_type"] == "compounded_profit_growth",
-            "expected_value"
+            compare["metric_type"] == "compounded_profit_growth", "expected_value"
         ] = compare["pat_cagr_5yr"]
 
-        compare.loc[
-            compare["metric_type"] == "roe",
-            "expected_value"
-        ] = compare["return_on_equity_pct"]
+        compare.loc[compare["metric_type"] == "roe", "expected_value"] = compare[
+            "return_on_equity_pct"
+        ]
 
         compare["difference_pct"] = (
-            compare["value_pct"] -
-            compare["expected_value"]
+            compare["value_pct"] - compare["expected_value"]
         ).abs()
 
-        review = compare[
-            compare["difference_pct"] > 5
-        ].copy()
+        review = compare[compare["difference_pct"] > 5].copy()
 
-        review.to_csv(
-            self.output / "manual_review.csv",
-            index=False
-        )
+        review.to_csv(self.output / "manual_review.csv", index=False)
 
         print("=" * 60)
         print("Validation Completed")
@@ -266,8 +203,6 @@ class AnalysisParser:
     def close(self):
 
         self.conn.close()
-
-
 
 
 if __name__ == "__main__":

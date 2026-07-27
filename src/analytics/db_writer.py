@@ -65,38 +65,27 @@ class DatabaseWriter:
         for _, r in df.iterrows():
 
             rows.append(
-
                 (
-
                     r["company_id"],
                     r["year"],
-
                     r["net_profit_margin_pct"],
                     r["operating_profit_margin_pct"],
                     r["return_on_equity_pct"],
-
                     r["debt_to_equity"],
                     r["interest_coverage"],
                     r["asset_turnover"],
-
                     r["free_cash_flow_cr"],
                     r["capex_cr"],
-
                     r["earnings_per_share"],
                     r["book_value_per_share"],
-
                     r["dividend_payout_ratio_pct"],
                     r["total_debt_cr"],
                     r["cash_from_operations_cr"],
-
                     r["revenue_cagr_5yr"],
                     r["pat_cagr_5yr"],
                     r["eps_cagr_5yr"],
-
-                    r["composite_quality_score"]
-
+                    r["composite_quality_score"],
                 )
-
             )
 
         cursor.executemany(insert_sql, rows)

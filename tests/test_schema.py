@@ -15,7 +15,7 @@ EXPECTED_TABLES = [
     "financial_ratios",
     "market_cap",
     "peer_groups",
-    "stock_prices"
+    "stock_prices",
 ]
 
 
@@ -26,12 +26,15 @@ def test_table_exists(table):
 
     cur = conn.cursor()
 
-    cur.execute("""
+    cur.execute(
+        """
         SELECT name
         FROM sqlite_master
         WHERE type='table'
         AND name=?
-    """, (table,))
+    """,
+        (table,),
+    )
 
     result = cur.fetchone()
 

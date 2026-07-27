@@ -27,7 +27,6 @@ class CompanyClustering:
 
         print("Database Connected Successfully")
 
-
     # ============================================================
     # Load Latest Financial Data
     # ============================================================
@@ -69,7 +68,6 @@ class CompanyClustering:
 
         return df
 
-
     # ============================================================
     # Impute Missing Values using Sector Median
     # ============================================================
@@ -86,9 +84,8 @@ class CompanyClustering:
 
         for feature in features:
 
-            df[feature] = (
-                df.groupby("broad_sector")[feature]
-                .transform(lambda x: x.fillna(x.median()))
+            df[feature] = df.groupby("broad_sector")[feature].transform(
+                lambda x: x.fillna(x.median())
             )
 
         # Fill any remaining missing values (if an entire sector has NaNs)
@@ -99,8 +96,6 @@ class CompanyClustering:
         print("Missing values imputed successfully")
 
         return df
-
-
 
     # ============================================================
     # Scale Features
@@ -126,8 +121,6 @@ class CompanyClustering:
 
         return X_scaled, scaler
 
-
-
     # ============================================================
     # Train KMeans and Generate Elbow Plot
     # ============================================================
@@ -140,11 +133,7 @@ class CompanyClustering:
 
         for k in k_values:
 
-            model = KMeans(
-                n_clusters=k,
-                random_state=42,
-                n_init=10
-            )
+            model = KMeans(n_clusters=k, random_state=42, n_init=10)
 
             model.fit(X_scaled)
 
@@ -163,19 +152,13 @@ class CompanyClustering:
 
         print(f"Elbow plot saved to {elbow_path}")
 
-        kmeans = KMeans(
-            n_clusters=5,
-            random_state=42,
-            n_init=10
-        )
+        kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
 
         cluster_labels = kmeans.fit_predict(X_scaled)
 
         print("KMeans model trained successfully")
 
         return kmeans, cluster_labels
-
-
 
     # ============================================================
     # Generate Cluster Labels
@@ -188,7 +171,7 @@ class CompanyClustering:
             1: "Value Builders",
             2: "Stable Performers",
             3: "High Debt Companies",
-            4: "Emerging Businesses"
+            4: "Emerging Businesses",
         }
 
         distances = kmeans.transform(X_scaled)
@@ -198,8 +181,7 @@ class CompanyClustering:
         df["cluster_name"] = df["cluster_id"].map(cluster_names)
 
         df["distance_from_centroid"] = [
-            distances[i, cluster_labels[i]]
-            for i in range(len(df))
+            distances[i, cluster_labels[i]] for i in range(len(df))
         ]
 
         output = df[
@@ -219,8 +201,6 @@ class CompanyClustering:
 
         return output
 
-
-
     # ============================================================
     # Close Database Connection
     # ============================================================
@@ -230,7 +210,6 @@ class CompanyClustering:
         self.conn.close()
 
         print("Database Connection Closed")
-
 
 
 # ============================================================
@@ -249,11 +228,6 @@ if __name__ == "__main__":
 
     kmeans, cluster_labels = app.train_kmeans(X_scaled)
 
-    app.generate_cluster_labels(
-        df,
-        X_scaled,
-        kmeans,
-        cluster_labels
-    )
+    app.generate_cluster_labels(df, X_scaled, kmeans, cluster_labels)
 
     app.close()
