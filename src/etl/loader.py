@@ -21,10 +21,14 @@ SUPPORT_FILES = {
 }
 
 
+from pathlib import Path
+
 def load_excel(path, header):
     """
     Load a single Excel file.
     """
+    path = Path(path)
+
     try:
         df = pd.read_excel(path, header=header)
         print(f"Loaded {path.name}")
